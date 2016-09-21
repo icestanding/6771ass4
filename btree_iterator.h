@@ -11,6 +11,13 @@
 // iterator related interface stuff here; would be nice if you called your
 // iterator class btree_iterator (and possibly const_btree_iterator)
 
-#include "btree_iterator.tem"
+template <typename T> class btree;
 
+
+template <typename T>
+class btree_iterator {
+
+
+};
+#include "btree_iterator.tem"
 #endif
