@@ -16,7 +16,15 @@ template <typename T> class btree;
 
 template <typename T>
 class btree_iterator {
+public:
+    // iterator traits
+    typedef std::bidirectional_iterator_tag iterator_category;
+    typedef T                               value_type;
+    typedef T*                              pointer;
+    typedef T&                              reference;
+    typedef std::ptrdiff_t                  difference_type;
 
+private:
 
 };
 #include "btree_iterator.tem"
