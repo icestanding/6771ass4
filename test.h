@@ -22,15 +22,32 @@ private:
         T value_;
         std::shared_ptr<Node> next_;
         Node(const T &value): value_{value}, next_{nullptr} {};
+        T getv() {
+            return value_;
+        }
     };
     std::shared_ptr<Node> head_;
 
+
 public:
-    List(): head_{nullptr} {};
     friend class List_iterator<T>;
+    typedef List_iterator<T> iterator;
+
+    // constructor
+    List(): head_{nullptr} {};
     ~List() {
         head_ = nullptr;
     }
+
+    //  member function
+    iterator begin() {
+        return iterator(head_);
+    }
+
+    iterator end() {
+        return iterator(nullptr);
+    }
+
     void insert(const T &value) {
         if (head_ == nullptr) {
             head_ = std::make_shared<Node>(value);
@@ -41,6 +58,6 @@ public:
             }
             tmp->next_ = std::make_shared<Node>(value);
         }
-
     }
+
 };
