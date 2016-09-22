@@ -41,6 +41,6 @@ typename btree_iterator<T>::reference btree_iterator<T>::operator*() {
     return npointer_->value_[index_];
 }
 
-
+// nullptr, return?
 #include "btree_iterator.tem"
 #endif

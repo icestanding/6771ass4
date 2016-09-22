@@ -5,18 +5,20 @@
 
 
 int main() {
-//    std::cout << "hello world" << std::endl;
+    std::cout << "hello world" << std::endl;
 //    std::vector<int> a;
 //    for (int i = 0; i < 10; ++i) {
 //        a.push_back(i);
 //    }
+//    auto b = a.end();
+//    std::cout<<*b;
 //    a.insert(a.begin(), -1);
 ////    for (int j = 0; j < a.size(); ++j) {
 ////        std::cout<<a[]
 ////    }
     btree<int> a;
     a.insert(1);
-
+    auto b = a.end();
 
 
 //
