@@ -16,14 +16,7 @@ int main() {
 ////    }
     btree<int> a;
     a.insert(1);
-//    auto b = a.begin();
-//    std::cout<<*b;
-    for (int i = 0;  i <  41; ++i) {
-        a.insert(i);
-    }
-    std::cout<<a<<std::endl;
-    btree<int> copy(a);
-    std::cout<<copy;
+
 
 
 //

@@ -71,7 +71,7 @@ class btree {
 //   *
 //   * @param original an rvalue reference to a B-Tree object
 //   */
-//  btree(btree<T>&& original);
+    btree(btree<T>&& original);
 //
 //
 //  /**
@@ -134,7 +134,7 @@ class btree {
 //    * @return an iterator to the matching element, or whatever the
 //    *         non-const end() returns if no such match was ever found.
 //    */
-//  iterator find(const T& elem);
+      iterator find(const T& elem);
 //
 //  /**
 //    * Identical in functionality to the non-const version of find,
@@ -145,7 +145,9 @@ class btree {
 //    * @return an iterator to the matching element, or whatever the
 //    *         const end() returns if no such match was ever found.
 //    */
-//  const_iterator find(const T& elem) const;
+
+//      const_iterator find(const T& elem) const;
+
 //
 //  /**
 //    * Operation which inserts the specified element
@@ -234,8 +236,47 @@ btree<T>::btree(const btree<T> &original) {
     std::shared_ptr<Node> pointee(node);
     head_ = pointee;
 }
+// move constructor
+template <typename T>
+btree<T>::btree(btree<T> &&original) {
+    size_ = std::move(original.size_);
+    head_ = original.head_;
+    original.head_ = nullptr;
+}
+// find
+template <typename T>
+typename btree<T>::iterator btree<T>::find(const T &elem) {
+    if (head_ == nullptr) {
+        return iterator(nullptr, 0);
+    }
+    auto root = head_;
+    while (true) {
+        if (root->value_.size() < size_) {
+            for (int i = 0; i < root->value_.size(); ++i) {
+                if(root->value_[i] == elem) {
+                    return iterator(root, i);
+                }
+            }
+            return iterator(nullptr, 0);
+        }
+        else {
+            auto position = root->find_position(elem);
+            if(position.second == false) {
+                return iterator(root, position.first);
 
+            }
+            else {
+                if(root->children_[position.first] != nullptr) {
+                    root = root->children_[position.first];
+                } else {
+                    return iterator(nullptr, 0);
+                }
+            }
+        }
+    }
+}
 
+// insert with priority
 template <typename T>
 std::pair<unsigned int, bool> btree<T>::Node::priority_insert(const T &value) {
     for (unsigned int i = 0; i < value_.size(); ++i) {
@@ -254,7 +295,7 @@ std::pair<unsigned int, bool> btree<T>::Node::priority_insert(const T &value) {
     return std::pair<unsigned int, bool>(value_.size() - 1, true);
 }
 
-
+// find position;
 template <typename T>
 std::pair<unsigned int, bool> btree<T>::Node::find_position(const T &value) {
     for(unsigned int i; i <= size_; i++) {
