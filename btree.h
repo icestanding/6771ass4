@@ -63,7 +63,7 @@ class btree {
 //   *
 //   * @param original a const lvalue reference to a B-Tree object
 //   */
-//  btree(const btree<T>& original);
+    btree(const btree<T>& original);
 //
 //  /**
 //   * Move constructor
@@ -198,14 +198,42 @@ private:
         // member function
         Node(const T &value, size_t size,  std::shared_ptr<Node> parent = nullptr):
                 value_(1, value), children_(size + 1, nullptr), size_{size} ,parent_{parent} {};
+        Node(const Node &cpy);
         std::pair<unsigned int, bool> priority_insert(const T &);
         std::pair<unsigned int, bool> find_position(const T &);
+
     };
     size_t size_;
     std::shared_ptr<Node> head_;
     std::vector<std::pair<std::shared_ptr<Node>, unsigned int>> preorder_;
 };
+// node copy constructor
+template <typename T>
+btree<T>::Node::Node(const Node &cpy) {
+    size_ = cpy.size_;
+    for (int k = 0; k < size_ + 1; ++k) {
+        children_.push_back(nullptr);
+    }
+    for (unsigned int i = 0; i < cpy.value_.size(); ++i) {
+        value_.push_back(cpy.value_[i]);
+    }
+    for (int j = 0; j < cpy.children_.size(); ++j) {
+        if(cpy.children_[j] != nullptr) {
+            auto node = new Node(*cpy.children_[j]);
+            auto pointee = std::shared_ptr<btree<T>::Node>(node);
+            children_[j] = pointee;
 
+        }
+    }
+}
+// copy constructor
+template <typename T>
+btree<T>::btree(const btree<T> &original) {
+    size_ = original.size_;
+    auto node =  new Node(*original.head_);
+    std::shared_ptr<Node> pointee(node);
+    head_ = pointee;
+}
 
 
 template <typename T>
@@ -225,6 +253,7 @@ std::pair<unsigned int, bool> btree<T>::Node::priority_insert(const T &value) {
     value_.push_back(value);
     return std::pair<unsigned int, bool>(value_.size() - 1, true);
 }
+
 
 template <typename T>
 std::pair<unsigned int, bool> btree<T>::Node::find_position(const T &value) {
