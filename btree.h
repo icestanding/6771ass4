@@ -98,17 +98,23 @@ class btree {
 //   */
 //  friend std::ostream& operator<< <T> (std::ostream& os, const btree<T>& tree);
 //
-//  /**
-//   * The following can go here
-//   * -- begin()
-//   * -- end()
-//   * -- rbegin()
-//   * -- rend()
-//   * -- cbegin()
-//   * -- cend()
-//   * -- crbegin()
-//   * -- crend()
-//   */
+  /**
+   * The following can go here
+   * -- begin()
+   * -- end()
+   * -- rbegin()
+   * -- rend()
+   * -- cbegin()
+   * -- cend()
+   * -- crbegin()
+   * -- crend()
+   */
+    iterator begin() {
+        return iterator(head_, 0);
+    }
+    iterator end() {
+        return iterator(nullptr, 0);
+    }
 //
 //  /**
 //    * Returns an iterator to the matching element, or whatever
@@ -183,10 +189,10 @@ private:
         std::vector<T> value_;
         std::vector<std::shared_ptr<Node>> children_;
         std::shared_ptr<Node> parent_;
+        size_t nsize_;
 
-        Node(const T &value): value_{value}, children_(size_, nullptr) {};
+        Node(const T &value, size_t size): value_{value}, children_(size, nullptr), nsize_{size} {};
     };
-
     size_t size_;
     std::shared_ptr<Node> head_;
     std::vector<std::pair<std::shared_ptr<Node>, unsigned int>> preorder_;
@@ -205,7 +211,7 @@ std::pair<typename btree<T>::iterator, bool> btree<T>::insert(const T &elem) {
         return  std::pair<iterator, bool>(btree_iterator<T>(head_, 0), true);
     }
 
-//    bool insert_flag = false;
+    bool insert_flag = false;
 //    while (insert_flag == false) {
 //        if( == size_) {
 //

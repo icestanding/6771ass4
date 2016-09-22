@@ -27,11 +27,20 @@ public:
     // const std::shared_ptr<typename List<T>::Node>
     btree_iterator(const std::shared_ptr<typename btree<T>::Node> npointer, unsigned int index):
             npointer_{npointer}, index_{index} {};
+    reference operator * ();
+
 private:
     // save node address
     std::shared_ptr<typename btree<T>::Node> npointer_;
     // save value index in that node
     unsigned int index_;
 };
+
+template <typename T>
+typename btree_iterator<T>::reference btree_iterator<T>::operator*() {
+    return npointer_->value_[index_];
+}
+
+
 #include "btree_iterator.tem"
 #endif
