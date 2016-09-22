@@ -189,14 +189,52 @@ private:
         std::vector<T> value_;
         std::vector<std::shared_ptr<Node>> children_;
         std::shared_ptr<Node> parent_;
-        size_t nsize_;
+        size_t size_;
 
-        Node(const T &value, size_t size): value_{value}, children_(size, nullptr), nsize_{size} {};
+        Node(const T &value, size_t size,  std::shared_ptr<Node> parent = nullptr):
+                value_(1, value), children_(size, nullptr), size_{size} ,parent_{parent} {};
+        std::pair<unsigned int, bool> priority_insert(const T &);
+        std::pair<unsigned int, bool> find_position(const T &);
     };
+
     size_t size_;
     std::shared_ptr<Node> head_;
     std::vector<std::pair<std::shared_ptr<Node>, unsigned int>> preorder_;
 };
+
+
+template <typename T>
+std::pair<unsigned int, bool> btree<T>::Node::priority_insert(const T &value) {
+    for (unsigned int i = 0; i < value_.size(); ++i) {
+        if (value > value_[i]) {
+            continue;
+        }
+        else if (value == value_[i]) {
+            return std::pair<unsigned int, bool>(i, false);
+        }
+        else {
+            value_.insert(value_.begin() + i, i);
+            return std::pair<unsigned int, bool>(i, true);
+        }
+    }
+}
+
+template <typename T>
+std::pair<unsigned int, bool> btree<T>::Node::find_position(const T &value) {
+    for(unsigned int i; i <= size_; i++) {
+        if (value > value_[i]) {
+            continue;
+        }
+        else if (value == value_[i]) {
+            return std::pair<unsigned int, bool>(i, false);
+        }
+        else {
+             return std::pair<unsigned int, bool>(i, true);
+        }
+    }
+    return std::pair<unsigned int, bool>(size_, true);
+
+}
 
 // mapping index from value_ to children except the, first one and second one
 template <typename T>
@@ -212,12 +250,32 @@ std::pair<typename btree<T>::iterator, bool> btree<T>::insert(const T &elem) {
     }
 
     bool insert_flag = false;
-//    while (insert_flag == false) {
-//        if( == size_) {
-//
-//        }
-//    }
+    auto root = head_;
+    while (insert_flag == false) {
+        if (root->value_.size() < size_) {
+            auto index = root->priority_insert(elem);
+            return std::pair<iterator, bool>(btree_iterator<T>(root, index.first), index.second);
+        }
+        else {
+            auto position = root->find_position(elem);
+            if(position.second == false) {
+                return std::pair<iterator, bool>(btree_iterator<T>(root, position.first), position.second);
+            }
+            else {
+                if(root->children_[position.first] != nullptr) {
+                    root = root->children_[position.first];
+                } else {
+                    auto new_node = std::make_shared<Node>(elem, size_, root);
+                    root->children_[position.first] = new_node;
+                }
+            }
+
+        }
+    }
 }
+
+
+
 
 /**
  * The template implementation needs to be visible to whatever
