@@ -15,11 +15,15 @@
 #include <utility>
 #include <memory>
 #include <vector>
+#include <queue>
+#include <ostream>
 // we better include the iterator
 #include "btree_iterator.h"
 
 // we do this to avoid compiler errors about non-template friends
 // what do we do, remember? :)
+template <typename T> class btree;
+template <typename T> std::ostream& operator<<(std::ostream& os, const btree<T>& tree);
 
 template <typename T> 
 class btree {
@@ -96,7 +100,7 @@ class btree {
 //   * @param tree a const reference to a B-Tree object
 //   * @return a reference to os
 //   */
-//  friend std::ostream& operator<< <T> (std::ostream& os, const btree<T>& tree);
+    friend std::ostream& operator<< <T>(std::ostream& os, const btree<T>& tree);
 //
   /**
    * The following can go here
@@ -109,12 +113,12 @@ class btree {
    * -- crbegin()
    * -- crend()
    */
-    iterator begin() {
-        return iterator(head_, 0);
-    }
-    iterator end() {
-        return iterator(nullptr, 0);
-    }
+//    iterator begin() {
+//        return iterator(head_, 0);
+//    }
+//    iterator end() {
+//        return iterator(nullptr, 0);
+//    }
 //
 //  /**
 //    * Returns an iterator to the matching element, or whatever
@@ -180,10 +184,10 @@ class btree {
     */
 //    ~btree();
 
-    unsigned int vtoc(const unsigned int &num);
+
 
 private:
-  // The details of your implementation go here
+    // node
     class Node{
     public:
         std::vector<T> value_;
@@ -191,16 +195,17 @@ private:
         std::shared_ptr<Node> parent_;
         size_t size_;
 
+        // member function
         Node(const T &value, size_t size,  std::shared_ptr<Node> parent = nullptr):
                 value_(1, value), children_(size, nullptr), size_{size} ,parent_{parent} {};
         std::pair<unsigned int, bool> priority_insert(const T &);
         std::pair<unsigned int, bool> find_position(const T &);
     };
-
     size_t size_;
     std::shared_ptr<Node> head_;
     std::vector<std::pair<std::shared_ptr<Node>, unsigned int>> preorder_;
 };
+
 
 
 template <typename T>
@@ -233,25 +238,18 @@ std::pair<unsigned int, bool> btree<T>::Node::find_position(const T &value) {
         }
     }
     return std::pair<unsigned int, bool>(size_, true);
-
 }
 
-// mapping index from value_ to children except the, first one and second one
-template <typename T>
-unsigned int btree<T>::vtoc(const unsigned int &num) {
-    return num + 2;
-}
-
+// insertion
 template <typename T>
 std::pair<typename btree<T>::iterator, bool> btree<T>::insert(const T &elem) {
     if (head_ == nullptr) {
         head_ = std::make_shared<btree<T>::Node>(elem, size_);
         return  std::pair<iterator, bool>(btree_iterator<T>(head_, 0), true);
     }
-
-    bool insert_flag = false;
     auto root = head_;
-    while (insert_flag == false) {
+    // do insertion
+    while (true) {
         if (root->value_.size() < size_) {
             auto index = root->priority_insert(elem);
             return std::pair<iterator, bool>(btree_iterator<T>(root, index.first), index.second);
@@ -267,26 +265,45 @@ std::pair<typename btree<T>::iterator, bool> btree<T>::insert(const T &elem) {
                 } else {
                     auto new_node = std::make_shared<Node>(elem, size_, root);
                     root->children_[position.first] = new_node;
+                    return std::pair<iterator, bool>(btree_iterator<T>(new_node, 0), true);
                 }
             }
-
         }
     }
 }
 
+// print function
+template <typename T>
+std::ostream& operator<< (std::ostream& os, const btree<T>& tree) {
+    if(tree.head_ == nullptr) {
+        return os;
+    }
+    std::queue<std::shared_ptr<typename btree<T>::Node>>  bfs;
+    std::vector<T> answer;
+    bfs.push(tree.head_);
+    while(!bfs.empty()) {
+        auto node = bfs.front();
+        bfs.pop();
+        for (unsigned int i = 0; i < node->value_.size(); ++i) {
+            answer.push_back(node->value_[i]);
+        }
+        for (unsigned int i = 0; i < node->children_.size(); ++i) {
+            if (node->children_[i] != nullptr) {
+                bfs.push(node->children_[i]);
+            }
+        }
+    }
+    for (unsigned int j = 0; j < answer.size(); ++j) {
+        if(j == answer.size() - 1) {
+            os<<answer[j];
+            break;
+        }
+        os<<answer[j]<<" ";
+    }
+    return os;
+}
 
-
-
-/**
- * The template implementation needs to be visible to whatever
- * translation unit makes use of templatized btree methods.
- * The unconventional practice is to #include the implementation
- * file just before the end of the interface (sort of like
- * sneaking it in and hoping it isn't noticed).  Because the
- * .tem file is included here, the .h file is NOT #included in 
- * the .tem file.  We'd otherwise have circular inclusions
- * and the compiler would be peeved.
- */
+// question << stream
 
 #include "btree.tem"
 

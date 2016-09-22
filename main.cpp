@@ -16,12 +16,12 @@ int main() {
 ////    }
     btree<int> a;
     a.insert(1);
-    auto b = a.begin();
-    std::cout<<*b;
-    for (int i = 0; i <  100; ++i) {
+//    auto b = a.begin();
+//    std::cout<<*b;
+    for (int i = 0;  i <  100; ++i) {
         a.insert(i);
     }
-    std::cout<<"finish";
+    std::cout<<a;
 
 //
 //    std::priority_queue<int> q;
