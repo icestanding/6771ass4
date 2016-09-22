@@ -13,7 +13,8 @@
 #include <iostream>
 #include <cstddef>
 #include <utility>
-
+#include <memory>
+#include <vector>
 // we better include the iterator
 #include "btree_iterator.h"
 
@@ -24,24 +25,25 @@ template <typename T>
 class btree {
  public:
     friend class btree_iterator<T>;
+    typedef btree_iterator<T> iterator;
 
-//  /** Hmm, need some iterator typedefs here... friends? **/
-//
-//  /**
-//   * Constructs an empty btree.  Note that
-//   * the elements stored in your btree must
-//   * have a well-defined zero-arg constructor,
-//   * copy constructor, operator=, and destructor.
-//   * The elements must also know how to order themselves
-//   * relative to each other by implementing operator<
-//   * and operator==. (These are already implemented on
-//   * behalf of all built-ins: ints, doubles, strings, etc.)
-//   *
-//   * @param maxNodeElems the maximum number of elements
-//   *        that can be stored in each B-Tree node
-//   */
-//  btree(size_t maxNodeElems = 40);
-//
+  /** Hmm, need some iterator typedefs here... friends? **/
+
+  /**
+   * Constructs an empty btree.  Note that
+   * the elements stored in your btree must
+   * have a well-defined zero-arg constructor,
+   * copy constructor, operator=, and destructor.
+   * The elements must also know how to order themselves
+   * relative to each other by implementing operator<
+   * and operator==. (These are already implemented on
+   * behalf of all built-ins: ints, doubles, strings, etc.)
+   *
+   * @param maxNodeElems the maximum number of elements
+   *        that can be stored in each B-Tree node
+   */
+    btree(size_t maxNodeElems = 40): head_{nullptr}, size_{maxNodeElems} {};
+
 //  /**
 //   * The copy constructor and  assignment operator.
 //   * They allow us to pass around B-Trees by value.
@@ -162,20 +164,54 @@ class btree {
 //    *         stores true if and only if the element needed to be added
 //    *         because no matching element was there prior to the insert call.
 //    */
-//  std::pair<iterator, bool> insert(const T& elem);
-//
-//  /**
-//    * Disposes of all internal resources, which includes
-//    * the disposal of any client objects previously
-//    * inserted using the insert operation.
-//    * Check that your implementation does not leak memory!
-//    */
-//  ~btree();
-  
+    std::pair<iterator, bool> insert(const T& elem);
+
+  /**
+    * Disposes of all internal resources, which includes
+    * the disposal of any client objects previously
+    * inserted using the insert operation.
+    * Check that your implementation does not leak memory!
+    */
+//    ~btree();
+
+    unsigned int vtoc(const unsigned int &num);
+
 private:
   // The details of your implementation go here
+    class Node{
+    public:
+        std::vector<T> value_;
+        std::vector<std::shared_ptr<Node>> children_;
+        std::shared_ptr<Node> parent_;
+
+        Node(const T &value): value_{value}, children_(size_, nullptr) {};
+    };
+
+    size_t size_;
+    std::shared_ptr<Node> head_;
+    std::vector<std::pair<std::shared_ptr<Node>, unsigned int>> preorder_;
 };
 
+// mapping index from value_ to children except the, first one and second one
+template <typename T>
+unsigned int btree<T>::vtoc(const unsigned int &num) {
+    return num + 2;
+}
+
+template <typename T>
+std::pair<typename btree<T>::iterator, bool> btree<T>::insert(const T &elem) {
+    if (head_ == nullptr) {
+        head_ = std::make_shared<btree<T>::Node>(elem, size_);
+        return  std::pair<iterator, bool>(btree_iterator<T>(head_, 0), true);
+    }
+
+//    bool insert_flag = false;
+//    while (insert_flag == false) {
+//        if( == size_) {
+//
+//        }
+//    }
+}
 
 /**
  * The template implementation needs to be visible to whatever

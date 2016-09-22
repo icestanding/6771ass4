@@ -24,8 +24,14 @@ public:
     typedef T&                              reference;
     typedef std::ptrdiff_t                  difference_type;
 
+    // const std::shared_ptr<typename List<T>::Node>
+    btree_iterator(const std::shared_ptr<typename btree<T>::Node> npointer, unsigned int index):
+            npointer_{npointer}, index_{index} {};
 private:
-
+    // save node address
+    std::shared_ptr<typename btree<T>::Node> npointer_;
+    // save value index in that node
+    unsigned int index_;
 };
 #include "btree_iterator.tem"
 #endif
