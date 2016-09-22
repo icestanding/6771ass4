@@ -113,12 +113,12 @@ class btree {
    * -- crbegin()
    * -- crend()
    */
-//    iterator begin() {
-//        return iterator(head_, 0);
-//    }
-//    iterator end() {
-//        return iterator(nullptr, 0);
-//    }
+    iterator begin() {
+        return iterator(head_, 0);
+    }
+    iterator end() {
+        return iterator(nullptr, 0);
+    }
 //
 //  /**
 //    * Returns an iterator to the matching element, or whatever
@@ -197,7 +197,7 @@ private:
 
         // member function
         Node(const T &value, size_t size,  std::shared_ptr<Node> parent = nullptr):
-                value_(1, value), children_(size, nullptr), size_{size} ,parent_{parent} {};
+                value_(1, value), children_(size + 1, nullptr), size_{size} ,parent_{parent} {};
         std::pair<unsigned int, bool> priority_insert(const T &);
         std::pair<unsigned int, bool> find_position(const T &);
     };
@@ -222,6 +222,8 @@ std::pair<unsigned int, bool> btree<T>::Node::priority_insert(const T &value) {
             return std::pair<unsigned int, bool>(i, true);
         }
     }
+    value_.push_back(value);
+    return std::pair<unsigned int, bool>(value_.size() - 1, true);
 }
 
 template <typename T>
