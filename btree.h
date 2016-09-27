@@ -17,6 +17,7 @@
 #include <vector>
 #include <queue>
 #include <ostream>
+#include <stack>
 // we better include the iterator
 #include "btree_iterator.h"
 
@@ -46,7 +47,7 @@ class btree {
    * @param maxNodeElems the maximum number of elements
    *        that can be stored in each B-Tree node
    */
-    btree(size_t maxNodeElems = 40): head_{nullptr}, size_{maxNodeElems} {};
+    btree(size_t maxNodeElems = 3): head_{nullptr}, size_{maxNodeElems} {};
 
 //  /**
 //   * The copy constructor and  assignment operator.
@@ -113,9 +114,50 @@ class btree {
    * -- crbegin()
    * -- crend()
    */
+//public ArrayList<Integer> inorderTraversal(TreeNode root) {
+//        Stack<TreeNode> stack = new Stack<TreeNode>();
+//        ArrayList<Integer> result = new ArrayList<Integer>();
+//        TreeNode curt = root;
+//        while (curt != null || !stack.empty()) {
+//            while (curt != null) {
+//                stack.add(curt);
+//                curt = curt.left;
+//            }
+//            curt = stack.peek();
+//            stack.pop();
+//            result.add(curt.val);
+//            curt = curt.right;
+//        }
+//        return result;
+
+    // return in-order sequence, outside check if head empty
+//    void inorder(typename std::shared_ptr<Node> node,  unsigned int index) {
+//        // left middle right
+//        if(index == 0) {
+//            if(node->children_[0] != nullptr) {
+//                inorder(node->children_[0], 0);
+//            }
+//            std::cout<<node->value_[0]<<"\n";
+//            if(node->children_[1] != nullptr) {
+//                inorder(node->children_[0], 0);
+//            }
+//            inorder(node, 1);
+//        } else {
+//            std::cout<<node->value_[index]<<"\n";
+//            if(node->children_[index + 1] != nullptr) {
+//                inorder(node->children_[index + 1], 0);
+//            }
+//            if(index + 1 < size_){
+//                inorder(node, index + 1);
+//            }
+//        }
+//    }
+
     iterator begin() {
-        return iterator(head_, 0);
+        inorder(head_, 0);
+        return iterator(inorder_);
     }
+
     iterator end() {
         return iterator(nullptr, 0);
     }
@@ -207,7 +249,34 @@ private:
     };
     size_t size_;
     std::shared_ptr<Node> head_;
-    std::vector<std::pair<std::shared_ptr<Node>, unsigned int>> preorder_;
+//    std::vector<std::pair<std::shared_ptr<Node>, unsigned int>> preorder_;
+    std::vector<T*> inorder_;
+
+
+
+    void inorder(typename std::shared_ptr<Node> node,  unsigned int index) {
+        // left middle right
+        if(index == 0) {
+            if(node->children_[0] != nullptr) {
+                inorder(node->children_[0], 0);
+            }
+            std::cout<<node->value_[0]<<"\n";
+            if(node->children_[1] != nullptr) {
+                inorder(node->children_[0], 0);
+            }
+            inorder(node, 1);
+        } else {
+            std::cout<<node->value_[index]<<"\n";
+            if(node->children_[index + 1] != nullptr) {
+                inorder(node->children_[index + 1], 0);
+            }
+            if(index + 1 < size_){
+                inorder(node, index + 1);
+            }
+        }
+    }
+
+
 };
 // node copy constructor
 template <typename T>
@@ -298,15 +367,24 @@ std::pair<unsigned int, bool> btree<T>::Node::priority_insert(const T &value) {
 // find position;
 template <typename T>
 std::pair<unsigned int, bool> btree<T>::Node::find_position(const T &value) {
-    for(unsigned int i; i <= size_; i++) {
-        if (value > value_[i]) {
-            continue;
-        }
-        else if (value == value_[i]) {
-            return std::pair<unsigned int, bool>(i, false);
-        }
-        else {
-             return std::pair<unsigned int, bool>(i, true);
+
+    for (unsigned int i = 0; i <= size_ ; ++i) {
+        if(i == 0) {
+            if(value < value_[i]) {
+                return std::pair<unsigned int, bool>(0, true);
+            } else if (value == value_[0]) {
+                return std::pair<unsigned int, bool>(0, false);
+            } else {
+                continue;
+            }
+        } else {
+            if(value < value_[i]) {
+                return std::pair<unsigned int, bool>(i, true);
+            } else if (value == value_[i]) {
+                return std::pair<unsigned int, bool>(0, false);
+            } else {
+                continue;
+            }
         }
     }
     return std::pair<unsigned int, bool>(size_, true);
@@ -335,9 +413,9 @@ std::pair<typename btree<T>::iterator, bool> btree<T>::insert(const T &elem) {
                 if(root->children_[position.first] != nullptr) {
                     root = root->children_[position.first];
                 } else {
-                    auto new_node = std::make_shared<Node>(elem, size_, root);
-                    root->children_[position.first] = new_node;
-                    return std::pair<iterator, bool>(btree_iterator<T>(new_node, 0), true);
+                        auto new_node = std::make_shared<Node>(elem, size_, root);
+                        root->children_[position.first] = new_node;
+                        return std::pair<iterator, bool>(btree_iterator<T>(new_node, 0), true);
                 }
             }
         }

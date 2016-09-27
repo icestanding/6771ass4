@@ -5,38 +5,14 @@
 
 
 int main() {
-    std::cout << "hello world" << std::endl;
-//    std::vector<int> a;
-//    for (int i = 0; i < 10; ++i) {
-//        a.push_back(i);
-//    }
-//    auto b = a.end();
-//    std::cout<<*b;
-//    a.insert(a.begin(), -1);
-////    for (int j = 0; j < a.size(); ++j) {
-////        std::cout<<a[]
-////    }
     btree<int> a;
-    a.insert(1);
-    auto b = a.end();
-
-
-//
-//    std::priority_queue<int> q;
-//    for (int i = 0; i < 100; ++i) {
-//        q.push(i);
-//    }
-//    print_queue(q);
-//
-//
-//    std::priority_queue<int, std::vector<int>, std::greater<int> > q2;
-//
-//    for(int n : {1,8,5,6,3,4,0,9,7,2})
-//        q2.push(n);
-//
-//    print_queue(q2);
-//
-//    return 0;
-
-    // my self iterator
+    for (unsigned int i = 10; i < 15; ++i) {
+        a.insert(i);
+    }
+    for (unsigned int j = 0; j < 5; ++j) {
+        a.insert(j);
+    }
+//    std::cout<<a<<"\n";
+    auto b = a.begin();
+//    std::cout<<*b;
 }
