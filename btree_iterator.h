@@ -24,12 +24,41 @@ public:
     typedef T&                              reference;
     typedef std::ptrdiff_t                  difference_type;
 
-    // const std::shared_ptr<typename List<T>::Node>
-    // input vector, constructor the iterator
-//    btree_iterator(const std::shared_ptr<typename btree<T>::Node> npointer, unsigned int index):
-//            npointer_{npointer}, index_{index} {};
     btree_iterator(const std::vector<T*> &result, const unsigned int &index = 0): pointee_(result), index_{index}{}
-    reference operator * ();
+    reference operator * () { return *pointee_[index_];};
+//    reference operator -> () const {
+//        return &(operator*());
+//    };
+    pointer operator->() const { return pointee_[index_]; }
+    // pre-increment
+    btree_iterator<T> & operator++() {
+        if(index_ + 1 < pointee_.size()) {
+            index_ += 1;
+        }
+        return *this;
+    }
+    // post-increment
+    void operator ++(int) { ++(*this); }
+
+    btree_iterator<T> & operator--() {
+        if(index_ - 1 >= 0 ) {
+            index_ -= 1;
+        }
+        return *this;
+    }
+    void operator--(int) { --(*this); }
+
+    bool operator==(const btree_iterator<T>& other) const { return this->pointee_[index_] == other.pointee_[index_]; }
+    bool operator!=(const btree_iterator<T>& other) const { return !operator==(other); }
+
+//    // converstions from const to non-const version of iterator
+//    btree_iterator& operator=(const btree_const_iterator<T>& constIt) {
+//        pointee_ = constIt.pointee_;
+//        btree_ = constIt.btree_;
+//    }
+//    bool operator==(const btree_const_iterator<T>& other) const { return this->pointee_ == other.pointee_; }
+//    bool operator!=(const btree_const_iterator<T>& other) const { return !operator==(other); }
+
 
 private:
     // save index and pointer
@@ -37,13 +66,58 @@ private:
     std::vector<pointer> pointee_;
 };
 
-template <typename T>
-typename btree_iterator<T>::reference btree_iterator<T>::operator*() {
-    for (int i = 0; i < pointee_.size(); ++i) {
-        std::cout<<*pointee_[i]<<" ";
-    }
-    return *pointee_[index_];
-}
+
+//template <typename T>
+//class btree_const_iterator {
+//public:
+//    // iterator traits
+//    typedef std::bidirectional_iterator_tag iterator_category;
+//    typedef T                               value_type;
+//    typedef T*                              pointer;
+//    typedef T&                              reference;
+//    typedef std::ptrdiff_t                  difference_type;
+//
+//    btree_iterator(const std::vector<T*> &result, const unsigned int &index = 0): pointee_(result), index_{index}{}
+//    reference operator * () { return *pointee_[index_];};
+////    reference operator -> () const {
+////        return &(operator*());
+////    };
+//    pointer operator->() const { return pointee_[index_]; }
+//    // pre-increment
+//    btree_iterator<T> & operator++() {
+//        if(index_ + 1 < pointee_.size()) {
+//            index_ += 1;
+//        }
+//        return *this;
+//    }
+//    // post-increment
+//    void operator ++(int) { ++(*this); }
+//
+//    btree_iterator<T> & operator--() {
+//        if(index_ - 1 >= 0 ) {
+//            index_ -= 1;
+//        }
+//        return *this;
+//    }
+//    void operator--(int) { --(*this); }
+//
+//    bool operator==(const btree_iterator<T>& other) const { return this->pointee_[index_] == other.pointee_[index_]; }
+//    bool operator!=(const btree_iterator<T>& other) const { return !operator==(other); }
+//
+////    // converstions from const to non-const version of iterator
+////    btree_iterator& operator=(const btree_const_iterator<T>& constIt) {
+////        pointee_ = constIt.pointee_;
+////        btree_ = constIt.btree_;
+////    }
+////    bool operator==(const btree_const_iterator<T>& other) const { return this->pointee_ == other.pointee_; }
+////    bool operator!=(const btree_const_iterator<T>& other) const { return !operator==(other); }
+//
+//
+//private:
+//    // save index and pointer
+//    unsigned int index_;
+//    std::vector<pointer> pointee_;
+//};
 
 // nullptr, return?
 #include "btree_iterator.tem"
