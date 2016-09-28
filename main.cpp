@@ -6,10 +6,17 @@
 
 int main() {
     btree<int> a;
-    for (unsigned int i = 10; i < 15; ++i) {
+    for (unsigned int i = 80; i <90 ; ++i) {
         a.insert(i);
     }
-    for (unsigned int j = 0; j < 5; ++j) {
+    for (unsigned int i = 50; i <60 ; ++i) {
+        a.insert(i);
+    }
+    for (unsigned int i = 91; i <100 ; ++i) {
+        a.insert(i);
+    }
+
+    for (unsigned int j = 3; j < 4; ++j) {
         a.insert(j);
     }
 //    std::cout<<a<<"\n";

@@ -264,7 +264,9 @@ private:
             if(node->children_[1] != nullptr) {
                 inorder(node->children_[0], 0);
             }
-            inorder(node, 1);
+            if(index + 1 < node->value_.size()) {
+                inorder(node, 1);
+            }
         } else {
             std::cout<<node->value_[index]<<"\n";
             if(node->children_[index + 1] != nullptr) {
