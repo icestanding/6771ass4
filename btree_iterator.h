@@ -26,25 +26,23 @@ public:
 
     // const std::shared_ptr<typename List<T>::Node>
     // input vector, constructor the iterator
-    btree_iterator(const std::shared_ptr<typename btree<T>::Node> npointer, unsigned int index):
-            npointer_{npointer}, index_{index} {};
-    btree_iterator(const std::vector<T*> &result): pointee(result), index_(0) {}
+//    btree_iterator(const std::shared_ptr<typename btree<T>::Node> npointer, unsigned int index):
+//            npointer_{npointer}, index_{index} {};
+    btree_iterator(const std::vector<T*> &result, const unsigned int &index = 0): pointee_(result), index_{index}{}
     reference operator * ();
 
 private:
-    // save node address
-    std::shared_ptr<typename btree<T>::Node> npointer_;
-    // save value index in that node
+    // save index and pointer
     unsigned int index_;
-    std::vector<pointer> pointee;
+    std::vector<pointer> pointee_;
 };
 
 template <typename T>
 typename btree_iterator<T>::reference btree_iterator<T>::operator*() {
-    for (int i = 0; i < pointee.size(); ++i) {
-        std::cout<<*pointee[i]<<"\n";
+    for (int i = 0; i < pointee_.size(); ++i) {
+        std::cout<<*pointee_[i]<<" ";
     }
-    return *pointee[index_];
+    return *pointee_[index_];
 }
 
 // nullptr, return?

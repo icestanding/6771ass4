@@ -15,11 +15,23 @@ int main() {
     for (unsigned int i = 91; i <100 ; ++i) {
         a.insert(i);
     }
+    for (unsigned int i = 91; i <100 ; ++i) {
+        a.insert(i);
+    }
 
     for (unsigned int j = 3; j < 4; ++j) {
         a.insert(j);
     }
-//    std::cout<<a<<"\n";
+    for (unsigned int i = 1000; i < 1020 ; ++i) {
+        a.insert(i);
+    }
+    std::cout<<a<<"\n";
     auto b = a.begin();
+    std::cout<<*b;
+
+//    int c= 3;
+//    std::shared_ptr<int> a = std::make_shared<int>(c);
+//    std::cout<<*a;
+//    int *b = &c;
 //    std::cout<<*b;
 }
