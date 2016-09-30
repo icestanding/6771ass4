@@ -26,7 +26,7 @@ int main() {
         a.insert(i);
     }
     std::cout<<a<<"\n";
-    auto b = a.begin();
+
 
 
 }

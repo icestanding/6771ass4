@@ -31,7 +31,6 @@ class btree {
  public:
     friend class btree_iterator<T>;
     typedef btree_iterator<T> iterator;
-
   /** Hmm, need some iterator typedefs here... friends? **/
 
   /**
@@ -117,11 +116,12 @@ class btree {
 
 
     iterator begin() {
-        return iterator(head_, 0);
+
+        return iterator(head(), 0);
     }
 
     iterator end() {
-        return iterator(nullptr, 0);
+        return iterator(nullptr, -1);
     }
 //
 //  /**
@@ -242,7 +242,59 @@ private:
             }
         }
     }
+    std::shared_ptr<Node> head() const;
+    std::shared_ptr<Node> tail() const;
+    std::pair<std::shared_ptr<Node>, unsigned int> forward_next(std::pair<std::shared_ptr<Node>, unsigned int>) const;
+    std::pair<std::shared_ptr<Node>, unsigned int> backward_next(std::pair<std::shared_ptr<Node>, unsigned int>) const;
+
 };
+
+// return head
+template <typename T>
+std::shared_ptr<typename btree<T>::Node> btree<T>::head() const {
+    if(head_ == nullptr) {
+        return head_;
+    }
+    auto root = head_;
+    while (root != nullptr) {
+        if(root->children_[0] != nullptr) {
+            root = root->children_[0];
+        }
+        else {
+            break;
+        }
+    }
+    return root;
+}
+
+// tail
+template <typename T>
+std::shared_ptr<typename btree<T>::Node> btree<T>::tail() const {
+    if(head_ == nullptr) {
+        return head_;
+    }
+    auto root = head_;
+    while (root != nullptr) {
+        for (unsigned int i = 0; i < root->value_.size(); ++i) {
+            if(root->value_.size() < size_) {
+                return root;
+            }
+            if(root->children_[size_] == nullptr) {
+                return root;
+            } else {
+                root = root->children_[size_];
+            }
+        }
+    }
+}
+
+// move to next node
+template <typename T>
+std::pair<std::shared_ptr<typename btree<T>::Node>, unsigned int> btree<T>::forward_next(
+        std::pair<std::shared_ptr<Node>, unsigned int> node) const {
+
+}
+
 // node copy constructor
 template <typename T>
 btree<T>::Node::Node(const Node &cpy) {
@@ -380,7 +432,7 @@ std::pair<typename btree<T>::iterator, bool> btree<T>::insert(const T &elem) {
                 } else {
                         auto new_node = std::make_shared<Node>(elem, size_, root);
                         root->children_[position.first] = new_node;
-                        return std::pair<iterator, bool>(btree_iterator<T>(root->children_[position.first], 0), true);
+                        return std::pair<iterator, bool>(btree_iterator<T>(new_node, 0), true);
                 }
             }
         }

@@ -30,8 +30,9 @@ public:
 
     btree_iterator(const  std::shared_ptr<typename btree<T>::Node> pointee, const unsigned int &index):
             pointee_(pointee), index_{index} {}
-
     reference operator * () { return (*pointee_).value_[index_];};
+
+    btree_iterator & operator++();
 
 private:
     // save index and pointer
@@ -41,7 +42,10 @@ private:
 };
 
 
+template <typename T>
+btree_iterator<T> & btree_iterator<T>::operator++() {
 
+}
 
 
 // nullptr, return?
