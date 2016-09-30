@@ -2,6 +2,7 @@
 #define BTREE_ITERATOR_H
 
 #include <iterator>
+#include "btree.h"
 
 /**
  * You MUST implement the btree iterators as (an) external class(es) in this file.
@@ -14,9 +15,12 @@
 template <typename T> class btree;
 
 
+// iterator, const iterator, reverse iterator, reverse const iterator
+
 template <typename T>
 class btree_iterator {
 public:
+
     // iterator traits
     typedef std::bidirectional_iterator_tag iterator_category;
     typedef T                               value_type;
@@ -24,100 +28,21 @@ public:
     typedef T&                              reference;
     typedef std::ptrdiff_t                  difference_type;
 
-    btree_iterator(const std::vector<T*> &result, const unsigned int &index = 0): pointee_(result), index_{index}{}
-    reference operator * () { return *pointee_[index_];};
-//    reference operator -> () const {
-//        return &(operator*());
-//    };
-    pointer operator->() const { return pointee_[index_]; }
-    // pre-increment
-    btree_iterator<T> & operator++() {
-        if(index_ + 1 < pointee_.size()) {
-            index_ += 1;
-        }
-        return *this;
-    }
-    // post-increment
-    void operator ++(int) { ++(*this); }
+    btree_iterator(const  std::shared_ptr<typename btree<T>::Node> pointee, const unsigned int &index):
+            pointee_(pointee), index_{index} {}
 
-    btree_iterator<T> & operator--() {
-        if(index_ - 1 >= 0 ) {
-            index_ -= 1;
-        }
-        return *this;
-    }
-    void operator--(int) { --(*this); }
-
-    bool operator==(const btree_iterator<T>& other) const { return this->pointee_[index_] == other.pointee_[index_]; }
-    bool operator!=(const btree_iterator<T>& other) const { return !operator==(other); }
-
-//    // converstions from const to non-const version of iterator
-//    btree_iterator& operator=(const btree_const_iterator<T>& constIt) {
-//        pointee_ = constIt.pointee_;
-//        btree_ = constIt.btree_;
-//    }
-//    bool operator==(const btree_const_iterator<T>& other) const { return this->pointee_ == other.pointee_; }
-//    bool operator!=(const btree_const_iterator<T>& other) const { return !operator==(other); }
-
+    reference operator * () { return (*pointee_).value_[index_];};
 
 private:
     // save index and pointer
+    // casue each node save multiple value by vector, so I need to save the value index in in the node's value vector
     unsigned int index_;
-    std::vector<pointer> pointee_;
+    std::shared_ptr<typename btree<T>::Node> pointee_;
 };
 
 
-//template <typename T>
-//class btree_const_iterator {
-//public:
-//    // iterator traits
-//    typedef std::bidirectional_iterator_tag iterator_category;
-//    typedef T                               value_type;
-//    typedef T*                              pointer;
-//    typedef T&                              reference;
-//    typedef std::ptrdiff_t                  difference_type;
-//
-//    btree_iterator(const std::vector<T*> &result, const unsigned int &index = 0): pointee_(result), index_{index}{}
-//    reference operator * () { return *pointee_[index_];};
-////    reference operator -> () const {
-////        return &(operator*());
-////    };
-//    pointer operator->() const { return pointee_[index_]; }
-//    // pre-increment
-//    btree_iterator<T> & operator++() {
-//        if(index_ + 1 < pointee_.size()) {
-//            index_ += 1;
-//        }
-//        return *this;
-//    }
-//    // post-increment
-//    void operator ++(int) { ++(*this); }
-//
-//    btree_iterator<T> & operator--() {
-//        if(index_ - 1 >= 0 ) {
-//            index_ -= 1;
-//        }
-//        return *this;
-//    }
-//    void operator--(int) { --(*this); }
-//
-//    bool operator==(const btree_iterator<T>& other) const { return this->pointee_[index_] == other.pointee_[index_]; }
-//    bool operator!=(const btree_iterator<T>& other) const { return !operator==(other); }
-//
-////    // converstions from const to non-const version of iterator
-////    btree_iterator& operator=(const btree_const_iterator<T>& constIt) {
-////        pointee_ = constIt.pointee_;
-////        btree_ = constIt.btree_;
-////    }
-////    bool operator==(const btree_const_iterator<T>& other) const { return this->pointee_ == other.pointee_; }
-////    bool operator!=(const btree_const_iterator<T>& other) const { return !operator==(other); }
-//
-//
-//private:
-//    // save index and pointer
-//    unsigned int index_;
-//    std::vector<pointer> pointee_;
-//};
+
+
 
 // nullptr, return?
 #include "btree_iterator.tem"

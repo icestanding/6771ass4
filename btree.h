@@ -117,7 +117,7 @@ class btree {
 
 
     iterator begin() {
-        return iterator(inorder_);
+        return iterator(head_, 0);
     }
 
     iterator end() {
@@ -196,7 +196,9 @@ private:
     // node
     class Node{
     public:
+        // vector save the sub-node value
         std::vector<T> value_;
+        // vector save each children pointer
         std::vector<std::shared_ptr<Node>> children_;
         std::shared_ptr<Node> parent_;
         size_t size_;
@@ -209,10 +211,8 @@ private:
         std::pair<unsigned int, bool> find_position(const T &);
 
     };
-
     size_t size_;
     std::shared_ptr<Node> head_;
-    std::vector<T*> inorder_;
 
 
 
@@ -223,7 +223,7 @@ private:
                 inorder(node->children_[0], 0);
             }
 //            std::cout<<node->value_[0]<<"\n";
-            inorder_.push_back(&(node->value_[index]));
+//            inorder_.push_back(&(node->value_[index]));
             if(node->children_[1] != nullptr) {
                 inorder(node->children_[0], 0);
             }
@@ -233,7 +233,7 @@ private:
         }
         else {
 //            std::cout<<node->value_[index]<<"\n";
-            inorder_.push_back(&(node->value_[index]));
+//            inorder_.push_back(&(node->value_[index]));
             if(node->children_[index + 1] != nullptr) {
                 inorder(node->children_[index + 1], 0);
             }
@@ -280,9 +280,32 @@ btree<T>::btree(btree<T> &&original) {
 // find
 template <typename T>
 typename btree<T>::iterator btree<T>::find(const T &elem) {
-    for (unsigned int i = 0; i < inorder_.size() ; ++i) {
-        if(elem == *inorder_[i]) {
-            return iterator(inorder_,i);
+    if (head_ == nullptr) {
+        return iterator(nullptr, 0);
+    }
+    auto root = head_;
+    while (true) {
+        if (root->value_.size() < size_) {
+            for (int i = 0; i < root->value_.size(); ++i) {
+                if(root->value_[i] == elem) {
+                    return iterator(root, i);
+                }
+            }
+            return iterator(nullptr, 0);
+        }
+        else {
+            auto position = root->find_position(elem);
+            if(position.second == false) {
+                return iterator(root, position.first);
+
+            }
+            else {
+                if(root->children_[position.first] != nullptr) {
+                    root = root->children_[position.first];
+                } else {
+                    return iterator(nullptr, 0);
+                }
+            }
         }
     }
 }
@@ -337,23 +360,19 @@ template <typename T>
 std::pair<typename btree<T>::iterator, bool> btree<T>::insert(const T &elem) {
     if (head_ == nullptr) {
         head_ = std::make_shared<btree<T>::Node>(elem, size_);
-        inorder_.clear();
-        inorder(head_, 0);
-        return  std::pair<iterator, bool>(btree_iterator<T>(inorder_, 0), true);
+        return  std::pair<iterator, bool>(btree_iterator<T>(head_, 0), true);
     }
     auto root = head_;
     // do insertion
     while (true) {
         if (root->value_.size() < size_) {
             auto index = root->priority_insert(elem);
-            inorder_.clear();
-            inorder(head_, 0);
             return std::pair<iterator, bool>(btree<T>::find(elem), index.second);
         }
         else {
             auto position = root->find_position(elem);
             if(position.second == false) {
-                return std::pair<iterator, bool>(btree_iterator<T>(inorder_, position.first), position.second);
+                return std::pair<iterator, bool>(btree_iterator<T>(root, position.first), position.second);
             }
             else {
                 if(root->children_[position.first] != nullptr) {
@@ -361,9 +380,7 @@ std::pair<typename btree<T>::iterator, bool> btree<T>::insert(const T &elem) {
                 } else {
                         auto new_node = std::make_shared<Node>(elem, size_, root);
                         root->children_[position.first] = new_node;
-                         inorder_.clear();
-                        inorder(head_, 0);
-                        return std::pair<iterator, bool>(btree<T>::find(elem), true);
+                        return std::pair<iterator, bool>(btree_iterator<T>(root->children_[position.first], 0), true);
                 }
             }
         }
