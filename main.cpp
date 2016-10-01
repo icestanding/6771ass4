@@ -6,7 +6,6 @@
 
 int main() {
     btree<int> a;
-    btree<int> c;
     for (unsigned int i = 6; i < 10 ; ++i) {
         a.insert(i);
     }
@@ -22,8 +21,8 @@ int main() {
     for (unsigned int i = 15; i <20 ; ++i) {
         a.insert(i);
     }
-
-
+    auto c = a.crend();
+    std::cout<<*c;
 
 
 
