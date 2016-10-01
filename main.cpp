@@ -6,6 +6,7 @@
 
 int main() {
     btree<int> a;
+    btree<int> c;
     for (unsigned int i = 6; i < 10 ; ++i) {
         a.insert(i);
     }
@@ -22,18 +23,8 @@ int main() {
         a.insert(i);
     }
 
-    std::cout<<a<<"\n";
-    auto b = a.begin();
-    for (unsigned int k = 0; k < 20; ++k) {
-        std::cout<<*b<<"\n";
-        ++b;
-    }
-    std::cout<<*b<<"\n";
-    std::cout<<"decrease"<<"\n";
-    for (unsigned int k = 0; k < 20; ++k) {
-        --b;
-        std::cout << *b << "\n";
-    }
+
+
 
 
 }

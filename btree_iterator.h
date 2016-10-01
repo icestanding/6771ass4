@@ -89,7 +89,7 @@ btree_iterator<T> & btree_iterator<T>::operator++() {
     }
 }
 
-//
+// becasue my data structure of my btree hard to implement backward -, -
 template <typename T>
 btree_iterator<T> & btree_iterator<T>::operator--() {
     auto root = pointee_;
@@ -114,7 +114,6 @@ btree_iterator<T> & btree_iterator<T>::operator--() {
                 root = root->parent_;
                 while (true) {
                     for (unsigned int i = 0; i < root->value_.size(); ++i) {
-
                         if (tmp < root->value_[i]) {
                             if(i == 0) {
                                 if(root->parent_ != nullptr) {
