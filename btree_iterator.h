@@ -33,6 +33,7 @@ public:
     reference operator * () { return (*pointee_).value_[index_];};
     // prefix
     btree_iterator & operator++();
+    btree_iterator & operator--();
 
 private:
     // save index and pointer
@@ -86,12 +87,64 @@ btree_iterator<T> & btree_iterator<T>::operator++() {
         index_ = 0;
         return *this;
     }
-
 }
 
+//
+template <typename T>
+btree_iterator<T> & btree_iterator<T>::operator--() {
+    auto root = pointee_;
+    auto index =  index_;
+    if(root->children_[index] != nullptr) {
+        root = root->children_[index];
+        while (root->children_[root->value_.size()] != nullptr) {
+            root = root->children_[root->value_.size()];
+        }
+        pointee_ = root;
+        index_ = root->value_.size() - 1;
+        return *this;
+    }
+    else {
+        if(index != 0) {
+            index_ = index - 1;
+            return *this;
+        }
+        else {
+            auto tmp = root->value_[0];
+            if(root->parent_ != nullptr) {
+                root = root->parent_;
+                while (true) {
+                    for (unsigned int i = 0; i < root->value_.size(); ++i) {
 
-
-
+                        if (tmp < root->value_[i]) {
+                            if(i == 0) {
+                                if(root->parent_ != nullptr) {
+                                    root = root->parent_;
+                                }
+                                else{
+                                    return *this;
+                                }
+                            }
+                            else {
+                                pointee_ = root;
+                                index_ = i - 1;
+                                return *this;
+                            }
+                        } else {
+                            if(i == root->value_.size() - 1) {
+                                pointee_ = root;
+                                index_ = i;
+                                return *this;
+                            }
+                        }
+                    }
+                }
+            }
+            else {
+                return *this;
+            }
+        }
+    }
+}
 
 
 
