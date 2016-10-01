@@ -121,7 +121,7 @@ class btree {
     }
 
     iterator end() {
-        return iterator(nullptr, -1);
+        return iterator(nullptr, 0);
     }
 //
 //  /**
@@ -214,8 +214,6 @@ private:
     size_t size_;
     std::shared_ptr<Node> head_;
 
-
-
     void inorder(typename std::shared_ptr<Node> node,  unsigned int index) {
         // left middle right
         if(index == 0) {
@@ -244,8 +242,9 @@ private:
     }
     std::shared_ptr<Node> head() const;
     std::shared_ptr<Node> tail() const;
-    std::pair<std::shared_ptr<Node>, unsigned int> forward_next(std::pair<std::shared_ptr<Node>, unsigned int>) const;
-    std::pair<std::shared_ptr<Node>, unsigned int> backward_next(std::pair<std::shared_ptr<Node>, unsigned int>) const;
+    std::pair<std::shared_ptr<Node>, unsigned int> forward_next(const std::shared_ptr<Node>  &node,
+                                                                const unsigned int &pos) const;
+//    std::pair<std::shared_ptr<Node>, unsigned int> backward_next(std::pair<std::shared_ptr<Node>, unsigned int>) const;
 
 };
 
@@ -291,8 +290,43 @@ std::shared_ptr<typename btree<T>::Node> btree<T>::tail() const {
 // move to next node
 template <typename T>
 std::pair<std::shared_ptr<typename btree<T>::Node>, unsigned int> btree<T>::forward_next(
-        std::pair<std::shared_ptr<Node>, unsigned int> node) const {
-
+        const std::shared_ptr<Node>  &node, const unsigned int &pos) const {
+    // left middle right
+    auto root = node;
+    auto index =  pos;
+    if(root->children_[index + 1] == nullptr) {
+        // if not the last one
+        if(index + 1 < root->value_.size()) {
+            return std::pair<std::shared_ptr<typename btree<T>::Node>, unsigned int>(root, index + 1);
+        } else {
+            auto tmp = root->value_[index];
+            root = root->parent_;
+            while (true) {
+                for (unsigned int i = 0; i < root->value_.size(); ++i) {
+                    if(tmp < root->value_[i]) {
+                        return std::pair<std::shared_ptr<typename btree<T>::Node>, unsigned int>(root, i);
+                    }
+                }
+                if(root->parent_ != nullptr) {
+                    root = root->parent_;
+                } else {
+                    return std::pair<std::shared_ptr<typename btree<T>::Node>, unsigned int>(nullptr, 1);
+                }
+            }
+        }
+    }
+    else {
+        root=root->children_[index + 1];
+        while (root != nullptr) {
+            if(root->children_[0] != nullptr) {
+                root = root->children_[0];
+            }
+            else {
+                break;
+            }
+        }
+        return std::pair<std::shared_ptr<typename btree<T>::Node>, unsigned int>(root, 0);
+    }
 }
 
 // node copy constructor

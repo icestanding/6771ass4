@@ -26,7 +26,11 @@ int main() {
         a.insert(i);
     }
     std::cout<<a<<"\n";
-
+    auto b = a.begin();
+    for (unsigned int k = 0; k < 40; ++k) {
+        std::cout<<*b<<"\n";
+        ++b;
+    }
 
 
 }
