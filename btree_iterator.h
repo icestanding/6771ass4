@@ -142,6 +142,11 @@ btree_iterator<T> & btree_iterator<T>::operator++() {
             return *this;
         } else {
             auto tmp = root->value_[index];
+            if(root->parent_ == nullptr) {
+                pointee_ = nullptr;
+                index_ = 0;
+                return *this;
+            }
             root = root->parent_;
             while (true) {
                 for (unsigned int i = 0; i < root->value_.size(); ++i) {

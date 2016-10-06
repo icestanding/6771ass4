@@ -399,7 +399,7 @@ std::pair<unsigned int, bool> btree<T>::Node::priority_insert(const T &value) {
             return std::pair<unsigned int, bool>(i, false);
         }
         else {
-            value_.insert(value_.begin() + i, i);
+            value_.insert(value_.begin() + i, value);
             return std::pair<unsigned int, bool>(i, true);
         }
     }

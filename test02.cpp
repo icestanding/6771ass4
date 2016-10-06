@@ -5,7 +5,7 @@
 #include "btree.h"
 
 void foo(const btree<int> &b) {
-  std::copy(b.begin(), b.end(), std::ostream_iterator<int>(std::cout, " "));
+  std::copy(b.begin(), b.end(), std::ostream_iterator<int>(std::cout, " "))  ;
   std::cout << std::endl;
 }
 
@@ -16,6 +16,7 @@ int main(void) {
   b.insert(10);
   b.insert(3);
   b.insert(4);
+//  std::cout<<b<<std::endl;
 
   for(btree<int>::iterator iter = b.begin(); iter != b.end(); ++iter)
     std::cout << *iter << std::endl;
