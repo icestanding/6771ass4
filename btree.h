@@ -34,7 +34,6 @@ class btree {
 
     typedef btree_iterator<T>                                    iterator;
     typedef btree_iterator<T>                              const_iterator;
-
     typedef btree_reverse_iterator<iterator>              reverse_iterator;
     typedef btree_reverse_iterator<const_iterator>  const_reverse_iterator;
   /** Hmm, need some iterator typedefs here... friends? **/
@@ -70,7 +69,7 @@ class btree {
     *
     * @param original an rvalue reference to a B-Tree object
     */
-    btree(btree<T>&& original);
+    btree(btree<T>&& original) noexcept;
 
     /**
     * Copy assignment
@@ -79,7 +78,6 @@ class btree {
     * @param rhs a const lvalue reference to a B-Tree object
     */
     btree<T>& operator=(const btree<T>& rhs);
-
     /**
     * Move assignment
     * Replaces the contents of this object with the "stolen"
@@ -87,7 +85,7 @@ class btree {
     *
     * @param rhs a const reference to a B-Tree object
     */
-    btree<T>& operator= (btree<T>&& rhs);
+    btree<T>& operator= (btree<T>&& rhs) noexcept;
 
     /**
     * Puts a breadth-first traversal of the B-Tree onto the output
@@ -114,20 +112,13 @@ class btree {
 
 
     iterator begin() const { return iterator(head(), 0); }
-
     iterator end() const { return iterator(nullptr, 0); }
-
     const_iterator cbegin() const { return const_iterator(head(), 0); };
-
     const_iterator cend() const { return const_iterator(nullptr, 0); };
-
     reverse_iterator rbegin() { return reverse_iterator(iterator(tail(), tail()->value_.size() )); }
-
     const_reverse_iterator crbegin() const  { return  const_reverse_iterator(
                 const_iterator( tail(), tail()->value_.size())); }
-
     reverse_iterator rend() { return  reverse_iterator(end());}
-
     const_reverse_iterator crend() const { return const_reverse_iterator(end());}
     /**
     * Returns an iterator to the matching element, or whatever
@@ -198,14 +189,14 @@ class btree {
 
 
 private:
-    // node
     class Node{
     public:
         // vector save the sub-node value
         std::vector<T> value_;
-        // vector save each children pointer
+        //  save children node
         std::vector<Node*> children_;
         Node * parent_;
+        //  save size of node
         size_t size_;
         // member function
         Node(const T &value, size_t size,  Node * parent = nullptr):
@@ -218,15 +209,12 @@ private:
     };
     Node * head_;
     size_t size_;
- 
-    // return head and tail
+
+    // return head and tail of a tree(inorder sequency)
     Node * head() const;
     Node * tail() const;
 
 };
-
-
-// question << stream
 
 #include "btree.tem"
 

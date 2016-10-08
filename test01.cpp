@@ -175,7 +175,7 @@ int main(void) {
   // a full-scale string test of the tree using iterators
   btree<string> *strTable = new btree<string>(40);
     
-  ifstream wordFile("twl.txt");
+  ifstream wordFile("/Users/chenyu/s4/6771/ass4/twl.txt");
   if (!wordFile)
     return 1;  // file couldn't be opened for some reason, abort... 
   

@@ -2,22 +2,30 @@
 // ++
 template <typename T>
 btree_iterator<T> & btree_iterator<T>::operator++() {
+    // variable for current pointee and index
     auto root = pointee_;
     auto index =  index_;
+    // if this node right childre is not exists
     if(root->children_[index + 1] == nullptr) {
-        // if not the last one
+        // if current value is not the last one in the node
         if(index + 1 < root->value_.size()) {
             index_ = index + 1;
             return *this;
-        } else {
+        } 
+        // if current node is the last one in the node
+        else {
+            // save current value as tmp
             auto tmp = root->value_[index];
+            // if current node is the root node of the tree
             if(root->parent_ == nullptr) {
                 pointee_ = nullptr;
                 index_ = 0;
                 return *this;
             }
+            // go to parent node
             root = root->parent_;
             while (true) {
+                // loop through the node to find a node value is large than current value(tmp)
                 for (unsigned int i = 0; i < root->value_.size(); ++i) {
                     if(tmp < root->value_[i]) {
                         pointee_ = root;
@@ -25,6 +33,8 @@ btree_iterator<T> & btree_iterator<T>::operator++() {
                         return *this;
                     }
                 }
+                // there is no value lagre than tmp, go parent
+                // check if this node is root node
                 if(root->parent_ != nullptr) {
                     root = root->parent_;
                 } else {
@@ -36,6 +46,8 @@ btree_iterator<T> & btree_iterator<T>::operator++() {
         }
     }
     else {
+        // if children exists, go deeper
+        // stop if there is no left most children
         root=root->children_[index + 1];
         while (root != nullptr) {
             if(root->children_[0] != nullptr) {
@@ -51,7 +63,8 @@ btree_iterator<T> & btree_iterator<T>::operator++() {
     }
 }
 
-// becasue my data structure of my btree, so it is hard to implement backward -, -
+// becasue my data structure of my btree, 
+// so it is hard to implement backward -, -
 template <typename T>
 btree_iterator<T> & btree_iterator<T>::operator--() {
     auto root = pointee_;
@@ -107,7 +120,7 @@ btree_iterator<T> & btree_iterator<T>::operator--() {
     }
 }
 
-// const iterator ++
+// const iterator ++, same like ++
 template <typename T>
 btree_const_iterator<T> & btree_const_iterator<T>::operator++() {
     auto root = pointee_;
@@ -154,7 +167,7 @@ btree_const_iterator<T> & btree_const_iterator<T>::operator++() {
     }
 }
 
-// const iterator --
+// const iterator -- same like --
 template <typename T>
 btree_const_iterator<T> & btree_const_iterator<T>::operator--() {
     auto root = pointee_;
