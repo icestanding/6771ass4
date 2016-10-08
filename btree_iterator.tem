@@ -1,2 +1,211 @@
 
-// your btree iterator implementation goes here
+// ++
+template <typename T>
+btree_iterator<T> & btree_iterator<T>::operator++() {
+    auto root = pointee_;
+    auto index =  index_;
+    if(root->children_[index + 1] == nullptr) {
+        // if not the last one
+        if(index + 1 < root->value_.size()) {
+            index_ = index + 1;
+            return *this;
+        } else {
+            auto tmp = root->value_[index];
+            if(root->parent_ == nullptr) {
+                pointee_ = nullptr;
+                index_ = 0;
+                return *this;
+            }
+            root = root->parent_;
+            while (true) {
+                for (unsigned int i = 0; i < root->value_.size(); ++i) {
+                    if(tmp < root->value_[i]) {
+                        pointee_ = root;
+                        index_ = i;
+                        return *this;
+                    }
+                }
+                if(root->parent_ != nullptr) {
+                    root = root->parent_;
+                } else {
+                    pointee_ = nullptr;
+                    index_ = 0;
+                    return *this;
+                }
+            }
+        }
+    }
+    else {
+        root=root->children_[index + 1];
+        while (root != nullptr) {
+            if(root->children_[0] != nullptr) {
+                root = root->children_[0];
+            }
+            else {
+                break;
+            }
+        }
+        pointee_ = root;
+        index_ = 0;
+        return *this;
+    }
+}
+
+// becasue my data structure of my btree, so it is hard to implement backward -, -
+template <typename T>
+btree_iterator<T> & btree_iterator<T>::operator--() {
+    auto root = pointee_;
+    auto index =  index_;
+    if(root->children_[index] != nullptr) {
+        root = root->children_[index];
+        while (root->children_[root->value_.size()] != nullptr) {
+            root = root->children_[root->value_.size()];
+        }
+        pointee_ = root;
+        index_ = root->value_.size() - 1;
+        return *this;
+    }
+    else {
+        if(index != 0) {
+            index_ = index - 1;
+            return *this;
+        }
+        else {
+            auto tmp = root->value_[0];
+            if(root->parent_ != nullptr) {
+                root = root->parent_;
+                while (true) {
+                    for (unsigned int i = 0; i < root->value_.size(); ++i) {
+                        if (tmp < root->value_[i]) {
+                            if(i == 0) {
+                                if(root->parent_ != nullptr) {
+                                    root = root->parent_;
+                                }
+                                else{
+                                    return *this;
+                                }
+                            }
+                            else {
+                                pointee_ = root;
+                                index_ = i - 1;
+                                return *this;
+                            }
+                        } else {
+                            if(i == root->value_.size() - 1) {
+                                pointee_ = root;
+                                index_ = i;
+                                return *this;
+                            }
+                        }
+                    }
+                }
+            }
+            else {
+                return *this;
+            }
+        }
+    }
+}
+
+// const iterator ++
+template <typename T>
+btree_const_iterator<T> & btree_const_iterator<T>::operator++() {
+    auto root = pointee_;
+    auto index =  index_;
+    if(root->children_[index + 1] == nullptr) {
+        // if not the last one
+        if(index + 1 < root->value_.size()) {
+            index_ = index + 1;
+            return *this;
+        } else {
+            auto tmp = root->value_[index];
+            root = root->parent_;
+            while (true) {
+                for (unsigned int i = 0; i < root->value_.size(); ++i) {
+                    if(tmp < root->value_[i]) {
+                        pointee_ = root;
+                        index_ = i;
+                        return *this;
+                    }
+                }
+                if(root->parent_ != nullptr) {
+                    root = root->parent_;
+                } else {
+                    pointee_ = nullptr;
+                    index_ = 0;
+                    return *this;
+                }
+            }
+        }
+    }
+    else {
+        root=root->children_[index + 1];
+        while (root != nullptr) {
+            if(root->children_[0] != nullptr) {
+                root = root->children_[0];
+            }
+            else {
+                break;
+            }
+        }
+        pointee_ = root;
+        index_ = 0;
+        return *this;
+    }
+}
+
+// const iterator --
+template <typename T>
+btree_const_iterator<T> & btree_const_iterator<T>::operator--() {
+    auto root = pointee_;
+    auto index =  index_;
+    if(root->children_[index] != nullptr) {
+        root = root->children_[index];
+        while (root->children_[root->value_.size()] != nullptr) {
+            root = root->children_[root->value_.size()];
+        }
+        pointee_ = root;
+        index_ = root->value_.size() - 1;
+        return *this;
+    }
+    else {
+        if(index != 0) {
+            index_ = index - 1;
+            return *this;
+        }
+        else {
+            auto tmp = root->value_[0];
+            if(root->parent_ != nullptr) {
+                root = root->parent_;
+                while (true) {
+                    for (unsigned int i = 0; i < root->value_.size(); ++i) {
+                        if (tmp < root->value_[i]) {
+                            if(i == 0) {
+                                if(root->parent_ != nullptr) {
+                                    root = root->parent_;
+                                }
+                                else{
+                                    return *this;
+                                }
+                            }
+                            else {
+                                pointee_ = root;
+                                index_ = i - 1;
+                                return *this;
+                            }
+                        } else {
+                            if(i == root->value_.size() - 1) {
+                                pointee_ = root;
+                                index_ = i;
+                                return *this;
+                            }
+                        }
+                    }
+                }
+            }
+            else {
+                return *this;
+            }
+        }
+    }
+}

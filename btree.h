@@ -121,13 +121,14 @@ class btree {
 
     const_iterator cend() const { return const_iterator(nullptr, 0); };
 
-    reverse_iterator rbegin() { return reverse_iterator(end()); }
+    reverse_iterator rbegin() { return reverse_iterator(iterator(tail(), tail()->value_.size() )); }
 
-    const_iterator crbegin() const  { return  const_reverse_iterator(cend()); }
+    const_reverse_iterator crbegin() const  { return  const_reverse_iterator(
+                const_iterator( tail(), tail()->value_.size())); }
 
-    reverse_iterator rend() { return  reverse_iterator(begin());}
+    reverse_iterator rend() { return  reverse_iterator(end());}
 
-    const_reverse_iterator crend() const { return const_reverse_iterator(cbegin());}
+    const_reverse_iterator crend() const { return const_reverse_iterator(end());}
     /**
     * Returns an iterator to the matching element, or whatever
     * the non-const end() returns if the element could
@@ -191,8 +192,8 @@ class btree {
     * inserted using the insert operation.
     * Check that your implementation does not leak memory!
     */
-    // use smart pointer all the time
-    ~btree(){};
+
+    ~btree()  { delete head_; };
 
 
 
@@ -209,8 +210,8 @@ private:
         // member function
         Node(const T &value, size_t size,  Node * parent = nullptr):
                 value_(1, value), children_(size + 1, nullptr), parent_{parent}, size_{size} {};
-        Node(const Node &cpy);
-	~Node();
+        Node(Node &cpy);
+	    ~Node();
         std::pair<unsigned int, bool> priority_insert(const T &);
         std::pair<unsigned int, bool> find_position(const T &);
 
@@ -218,285 +219,12 @@ private:
     Node * head_;
     size_t size_;
  
-
+    // return head and tail
     Node * head() const;
     Node * tail() const;
 
 };
-// copy assignment
-template <typename T>
-btree<T> & btree<T>::operator=(const btree<T> &rhs) {
-    if(head_ == rhs.head_ && size_ == rhs.size_) {
-        return *this;
-    }
-    size_ = rhs.size_;
-    auto node =  new Node(*rhs.head_);
-    head_ = node;
-    return *this;
-}
 
-
-// move assignment
-template <typename T>
-btree<T> & btree<T>::operator = (btree<T> &&rhs) {
-    if(head_ == rhs.head_ && size_ == rhs.size_) {
-        return *this;
-    }
-    head_ = rhs.head_;
-    rhs.head_ = nullptr;
-    size_ = rhs.size_;
-    return *this;
-}
-
-// return head
-template <typename T>
-typename btree<T>::Node* btree<T>::head() const {
-    if(head_ == nullptr) {
-        return head_;
-    }
-    auto root = head_;
-    while (root != nullptr) {
-        if(root->children_[0] != nullptr) {
-            root = root->children_[0];
-        }
-        else {
-            break;
-        }
-    }
-    return root;
-}
-
-// tail
-template <typename T>
-typename btree<T>::Node* btree<T>::tail() const {
-    if(head_ == nullptr) {
-        return head_;
-    }
-    auto root = head_;
-    while (root != nullptr) {
-        for (unsigned int i = 0; i < root->value_.size(); ++i) {
-            if(root->value_.size() < size_) {
-                return root;
-            }
-            if(root->children_[size_] == nullptr) {
-                return root;
-            } else {
-                root = root->children_[size_];
-            }
-        }
-    }
-}
-
-
-// node copy constructor
-template <typename T>
-btree<T>::Node::Node(const Node &cpy) {
-    size_ = cpy.size_;
-    for (unsigned int k = 0; k < size_ + 1; ++k) {
-        children_.push_back(nullptr);
-    }
-    for (unsigned int i = 0; i < cpy.value_.size(); ++i) {
-        value_.push_back(cpy.value_[i]);
-    }
-    for (unsigned int j = 0; j < cpy.children_.size(); ++j) {
-        if(cpy.children_[j] != nullptr) {
-            auto node = new Node(*cpy.children_[j]);
-            children_[j] = node;
-
-        }
-    }
-}
-// copy constructor
-template <typename T>
-btree<T>::btree(const btree<T> &original) {
-    size_ = original.size_;
-    auto new_head = new Node(*original.head_);
-    head_ = new_head;
-}
-// move constructor
-template <typename T>
-btree<T>::btree(btree<T> &&original) {
-    size_ = std::move(original.size_);
-    head_ = original.head_;
-    original.head_ = nullptr;
-}
-// find
-template <typename T>
-typename btree<T>::iterator btree<T>::find(const T &elem) {
-    if (head_ == nullptr) {
-        return iterator(nullptr, 0);
-    }
-    auto root = head_;
-    while (true) {
-        if (root->value_.size() < size_) {
-            for (unsigned int i = 0; i < root->value_.size(); ++i) {
-                if(root->value_[i] == elem) {
-                    return iterator(root, i);
-                }
-            }
-            return iterator(nullptr, 0);
-        }
-        else {
-            auto position = root->find_position(elem);
-            if(position.second == false) {
-                return iterator(root, position.first);
-
-            }
-            else {
-                if(root->children_[position.first] != nullptr) {
-                    root = root->children_[position.first];
-                } else {
-                    return iterator(nullptr, 0);
-                }
-            }
-        }
-    }
-}
-
-// const find;
-template <typename T>
-typename btree<T>::const_iterator btree<T>::find(const T &elem) const {
-    if (head_ == nullptr) {
-        return const_iterator(nullptr, 0);
-    }
-    auto root = head_;
-    while (true) {
-        if (root->value_.size() < size_) {
-            for (unsigned int i = 0; i < root->value_.size(); ++i) {
-                if(root->value_[i] == elem) {
-                    return const_iterator(root, i);
-                }
-            }
-            return const_iterator(nullptr, 0);
-        }
-        else {
-            auto position = root->find_position(elem);
-            if(position.second == false) {
-                return const_iterator(root, position.first);
-
-            }
-            else {
-                if(root->children_[position.first] != nullptr) {
-                    root = root->children_[position.first];
-                } else {
-                    return const_iterator(nullptr, 0);
-                }
-            }
-        }
-    }
-}
-
-// insert with priority
-template <typename T>
-std::pair<unsigned int, bool> btree<T>::Node::priority_insert(const T &value) {
-    for (unsigned int i = 0; i < value_.size(); ++i) {
-        if (value > value_[i]) {
-            continue;
-        }
-        else if (value == value_[i]) {
-            return std::pair<unsigned int, bool>(i, false);
-        }
-        else {
-            value_.insert(value_.begin() + i, value);
-            return std::pair<unsigned int, bool>(i, true);
-        }
-    }
-    value_.push_back(value);
-    return std::pair<unsigned int, bool>(value_.size() - 1, true);
-}
-
-// find position;
-template <typename T>
-std::pair<unsigned int, bool> btree<T>::Node::find_position(const T &value) {
-
-    for (unsigned int i = 0; i <= size_ ; ++i) {
-        if(i == 0) {
-            if(value < value_[i]) {
-                return std::pair<unsigned int, bool>(0, true);
-            } else if (value == value_[0]) {
-                return std::pair<unsigned int, bool>(0, false);
-            } else {
-                continue;
-            }
-        } else {
-            if(value < value_[i]) {
-                return std::pair<unsigned int, bool>(i, true);
-            } else if (value == value_[i]) {
-                return std::pair<unsigned int, bool>(0, false);
-            } else {
-                continue;
-            }
-        }
-    }
-    return std::pair<unsigned int, bool>(size_, true);
-}
-
-
-
-
-// insertion
-template <typename T>
-std::pair<typename btree<T>::iterator, bool> btree<T>::insert(const T &elem) {
-    if (head_ == nullptr) {
-        head_ = new Node(elem, size_);
-        return  std::pair<iterator, bool>(btree_iterator<T>(head_, 0), true);
-    }
-    auto root = head_;
-    // do insertion
-    while (true) {
-        if (root->value_.size() < size_) {
-            auto index = root->priority_insert(elem);
-            return std::pair<iterator, bool>(btree<T>::find(elem), index.second);
-        }
-        else {
-            auto position = root->find_position(elem);
-            if(position.second == false) {
-                return std::pair<iterator, bool>(btree_iterator<T>(root, position.first), position.second);
-            }
-            else {
-                if(root->children_[position.first] != nullptr) {
-                    root = root->children_[position.first];
-                }
-                else {
-                    auto new_node = new Node(elem, size_, root);
-                    root->children_[position.first] = new_node;
-                    return std::pair<iterator, bool>(btree_iterator<T>(new_node, 0), true);
-                }
-            }
-        }
-    }
-}
-
-// print function
-template <typename T>
-std::ostream& operator<< (std::ostream& os, const btree<T>& tree) {
-    if(tree.head_ == nullptr) {
-        return os;
-    }
-    std::queue<typename btree<T>:: Node *>  bfs;
-    std::vector<T> answer;
-    bfs.push(tree.head_);
-    while(!bfs.empty()) {
-        auto node = bfs.front();
-        bfs.pop();
-        for (unsigned int i = 0; i < node->value_.size(); ++i) {
-            answer.push_back(node->value_[i]);
-        }
-        for (unsigned int i = 0; i < node->children_.size(); ++i) {
-            if (node->children_[i] != nullptr) {
-                bfs.push(node->children_[i]);
-            }
-        }
-    }
-    for (unsigned int j = 0; j < answer.size(); ++j) {
-        if(j == answer.size() - 1) {
-            os<<answer[j];
-            break;
-        }
-        os<<answer[j]<<" ";
-    }
-    return os;
-}
 
 // question << stream
 
