@@ -210,6 +210,7 @@ private:
         Node(const T &value, size_t size,  Node * parent = nullptr):
                 value_(1, value), children_(size + 1, nullptr), parent_{parent}, size_{size} {};
         Node(const Node &cpy);
+	~Node();
         std::pair<unsigned int, bool> priority_insert(const T &);
         std::pair<unsigned int, bool> find_position(const T &);
 

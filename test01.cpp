@@ -70,12 +70,16 @@ long getRandom(long low, long high) {
 void insertRandomNumbers(btree<long>& testContainer, set<long>& stableContainer, size_t size) {
   cout << "Let's insert up to " << size << " numbers." << endl;
   for (size_t i = 0; i < size; i++) {
+
     long rndNum = getRandom(kMinInteger, kMaxInteger);
+
     pair<btree<long>::iterator, bool> result = testContainer.insert(rndNum);
+
     if (result.second) stableContainer.insert(rndNum);
     if ((i + 1) % 100000 == 0) 
       cout << "Inserted some " << (i + 1) << " numbers thus far." << endl;
   }
+
   cout << endl;
 }
 
@@ -92,7 +96,6 @@ void insertRandomNumbers(btree<long>& testContainer, set<long>& stableContainer,
 bool confirmEverythingMatches(const btree<long>& testContainer, const set<long>& stableContainer) {
   cout << "Confirms the btree and the set " 
           "contain exactly the same values..." << endl;
-      std::cout<<kMaxInteger<<"\n";
   for (long i = kMinInteger; i <= kMaxInteger; i++) {
     bool foundInTree = (testContainer.find(i) != testContainer.end());
     bool foundInSet = (stableContainer.find(i) != stableContainer.end());
@@ -101,7 +104,6 @@ bool confirmEverythingMatches(const btree<long>& testContainer, const set<long>&
       cout << "Mismatch at element: " << i << endl;
       return false;
     }
-    std::cout<<i<<" value test\n";
   }
   cout << "- btree checks out just fine." << endl;
 
@@ -123,8 +125,12 @@ int main(void) {
   btree<long> testContainer(99);
   set<long> stableContainer;
     
-  insertRandomNumbers(testContainer, stableContainer, 1000000);
+  insertRandomNumbers(testContainer, stableContainer, 10000000);
+
+  std::cout<<"fuck"<<std::endl;
+
   btree<long> btcpy = testContainer;
+
   confirmEverythingMatches(btcpy, stableContainer);
 
 /***
