@@ -29,7 +29,7 @@ public:
     typedef std::ptrdiff_t                  difference_type;
 
     // constructor
-    btree_iterator(const  std::shared_ptr<typename btree<T>::Node> pointee, const unsigned int &index):
+    btree_iterator(typename btree<T>::Node *pointee, const unsigned int &index):
             pointee_(pointee), index_{index} {}
 
     reference operator * () const { return (*pointee_).value_[index_];};
@@ -54,8 +54,8 @@ public:
 private:
     // save index and pointer
     // casue each node save multiple value by vector, so I need to save the value index in in the node's value vector
+    typename btree<T>::Node * pointee_;
     unsigned int index_;
-    std::shared_ptr<typename btree<T>::Node> pointee_;
 };
 
 template <typename T>
@@ -69,7 +69,7 @@ public:
     typedef T&                              reference;
     typedef std::ptrdiff_t                  difference_type;
 
-    btree_const_iterator(const  std::shared_ptr<typename btree<T>::Node> pointee, const unsigned int &index):
+    btree_const_iterator(const typename btree<T>::Node *pointee, const unsigned int &index):
             pointee_(pointee), index_{index} {}
     reference operator * () const { return (*pointee_).value_[index_];};
     // prefix
@@ -79,8 +79,8 @@ public:
 
 
 private:
+    typename btree<T>::Node *pointee_;
     unsigned int index_;
-    std::shared_ptr<typename btree<T>::Node> pointee_;
 };
 
 template <typename ForwardItType>
@@ -118,11 +118,6 @@ public:
 protected:
     ForwardItType current_;
 };
-
-
-
-
-
 
 
 

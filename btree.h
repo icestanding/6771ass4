@@ -32,10 +32,10 @@ class btree {
     friend class btree_iterator<T>;
     friend class btree_const_iterator<T>;
 
-    typedef btree_iterator<T> iterator;
-    typedef btree_iterator<T> const_iterator;
+    typedef btree_iterator<T>                                    iterator;
+    typedef btree_iterator<T>                              const_iterator;
 
-    typedef btree_reverse_iterator<iterator>        reverse_iterator;
+    typedef btree_reverse_iterator<iterator>              reverse_iterator;
     typedef btree_reverse_iterator<const_iterator>  const_reverse_iterator;
   /** Hmm, need some iterator typedefs here... friends? **/
 
@@ -52,7 +52,7 @@ class btree {
    * @param maxNodeElems the maximum number of elements
    *        that can be stored in each B-Tree node
    */
-    btree(size_t maxNodeElems = 3): head_{nullptr}, size_{maxNodeElems} {};
+    btree(size_t maxNodeElems = 40): head_{nullptr}, size_{maxNodeElems} {};
 
 
 
@@ -123,7 +123,7 @@ class btree {
 
     reverse_iterator rbegin() { return reverse_iterator(end()); }
 
-    const_iterator crbegin() const  { return const_reverse_iterator(cend()); }
+    const_iterator crbegin() const  { return  const_reverse_iterator(cend()); }
 
     reverse_iterator rend() { return  reverse_iterator(begin());}
 
@@ -203,23 +203,23 @@ private:
         // vector save the sub-node value
         std::vector<T> value_;
         // vector save each children pointer
-        std::vector<std::shared_ptr<Node>> children_;
-        std::shared_ptr<Node> parent_;
+        std::vector<Node*> children_;
+        Node * parent_;
         size_t size_;
-
         // member function
-        Node(const T &value, size_t size,  std::shared_ptr<Node> parent = nullptr):
-                value_(1, value), children_(size + 1, nullptr), size_{size} ,parent_{parent} {};
+        Node(const T &value, size_t size,  Node * parent = nullptr):
+                value_(1, value), children_(size + 1, nullptr), parent_{parent}, size_{size} {};
         Node(const Node &cpy);
         std::pair<unsigned int, bool> priority_insert(const T &);
         std::pair<unsigned int, bool> find_position(const T &);
 
     };
+    Node * head_;
     size_t size_;
-    std::shared_ptr<Node> head_;
+ 
 
-    std::shared_ptr<Node> head() const;
-    std::shared_ptr<Node> tail() const;
+    Node * head() const;
+    Node * tail() const;
 
 };
 // copy assignment
@@ -230,8 +230,7 @@ btree<T> & btree<T>::operator=(const btree<T> &rhs) {
     }
     size_ = rhs.size_;
     auto node =  new Node(*rhs.head_);
-    std::shared_ptr<Node> pointee(node);
-    head_ = pointee;
+    head_ = node;
     return *this;
 }
 
@@ -250,7 +249,7 @@ btree<T> & btree<T>::operator = (btree<T> &&rhs) {
 
 // return head
 template <typename T>
-std::shared_ptr<typename btree<T>::Node> btree<T>::head() const {
+typename btree<T>::Node* btree<T>::head() const {
     if(head_ == nullptr) {
         return head_;
     }
@@ -268,7 +267,7 @@ std::shared_ptr<typename btree<T>::Node> btree<T>::head() const {
 
 // tail
 template <typename T>
-std::shared_ptr<typename btree<T>::Node> btree<T>::tail() const {
+typename btree<T>::Node* btree<T>::tail() const {
     if(head_ == nullptr) {
         return head_;
     }
@@ -292,17 +291,16 @@ std::shared_ptr<typename btree<T>::Node> btree<T>::tail() const {
 template <typename T>
 btree<T>::Node::Node(const Node &cpy) {
     size_ = cpy.size_;
-    for (int k = 0; k < size_ + 1; ++k) {
+    for (unsigned int k = 0; k < size_ + 1; ++k) {
         children_.push_back(nullptr);
     }
     for (unsigned int i = 0; i < cpy.value_.size(); ++i) {
         value_.push_back(cpy.value_[i]);
     }
-    for (int j = 0; j < cpy.children_.size(); ++j) {
+    for (unsigned int j = 0; j < cpy.children_.size(); ++j) {
         if(cpy.children_[j] != nullptr) {
             auto node = new Node(*cpy.children_[j]);
-            auto pointee = std::shared_ptr<btree<T>::Node>(node);
-            children_[j] = pointee;
+            children_[j] = node;
 
         }
     }
@@ -311,9 +309,8 @@ btree<T>::Node::Node(const Node &cpy) {
 template <typename T>
 btree<T>::btree(const btree<T> &original) {
     size_ = original.size_;
-    auto node =  new Node(*original.head_);
-    std::shared_ptr<Node> pointee(node);
-    head_ = pointee;
+    auto new_head = new Node(*original.head_);
+    head_ = new_head;
 }
 // move constructor
 template <typename T>
@@ -331,7 +328,7 @@ typename btree<T>::iterator btree<T>::find(const T &elem) {
     auto root = head_;
     while (true) {
         if (root->value_.size() < size_) {
-            for (int i = 0; i < root->value_.size(); ++i) {
+            for (unsigned int i = 0; i < root->value_.size(); ++i) {
                 if(root->value_[i] == elem) {
                     return iterator(root, i);
                 }
@@ -364,7 +361,7 @@ typename btree<T>::const_iterator btree<T>::find(const T &elem) const {
     auto root = head_;
     while (true) {
         if (root->value_.size() < size_) {
-            for (int i = 0; i < root->value_.size(); ++i) {
+            for (unsigned int i = 0; i < root->value_.size(); ++i) {
                 if(root->value_[i] == elem) {
                     return const_iterator(root, i);
                 }
@@ -440,7 +437,7 @@ std::pair<unsigned int, bool> btree<T>::Node::find_position(const T &value) {
 template <typename T>
 std::pair<typename btree<T>::iterator, bool> btree<T>::insert(const T &elem) {
     if (head_ == nullptr) {
-        head_ = std::make_shared<btree<T>::Node>(elem, size_);
+        head_ = new Node(elem, size_);
         return  std::pair<iterator, bool>(btree_iterator<T>(head_, 0), true);
     }
     auto root = head_;
@@ -458,10 +455,11 @@ std::pair<typename btree<T>::iterator, bool> btree<T>::insert(const T &elem) {
             else {
                 if(root->children_[position.first] != nullptr) {
                     root = root->children_[position.first];
-                } else {
-                        auto new_node = std::make_shared<Node>(elem, size_, root);
-                        root->children_[position.first] = new_node;
-                        return std::pair<iterator, bool>(btree_iterator<T>(new_node, 0), true);
+                }
+                else {
+                    auto new_node = new Node(elem, size_, root);
+                    root->children_[position.first] = new_node;
+                    return std::pair<iterator, bool>(btree_iterator<T>(new_node, 0), true);
                 }
             }
         }
@@ -474,7 +472,7 @@ std::ostream& operator<< (std::ostream& os, const btree<T>& tree) {
     if(tree.head_ == nullptr) {
         return os;
     }
-    std::queue<std::shared_ptr<typename btree<T>::Node>>  bfs;
+    std::queue<typename btree<T>:: Node *>  bfs;
     std::vector<T> answer;
     bfs.push(tree.head_);
     while(!bfs.empty()) {

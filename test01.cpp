@@ -27,11 +27,12 @@ using std::ifstream;
 using std::ofstream;
 using std::set;
 using std::string;
+using std::pair;
 
 namespace {
 
 const long kMinInteger = 1000000;
-const long kMaxInteger = 100000000;
+const long kMaxInteger = 10000000;
 
 void initRandom(unsigned long);
 long getRandom(long low, long high);
@@ -91,6 +92,7 @@ void insertRandomNumbers(btree<long>& testContainer, set<long>& stableContainer,
 bool confirmEverythingMatches(const btree<long>& testContainer, const set<long>& stableContainer) {
   cout << "Confirms the btree and the set " 
           "contain exactly the same values..." << endl;
+      std::cout<<kMaxInteger<<"\n";
   for (long i = kMinInteger; i <= kMaxInteger; i++) {
     bool foundInTree = (testContainer.find(i) != testContainer.end());
     bool foundInSet = (stableContainer.find(i) != stableContainer.end());
@@ -99,6 +101,7 @@ bool confirmEverythingMatches(const btree<long>& testContainer, const set<long>&
       cout << "Mismatch at element: " << i << endl;
       return false;
     }
+    std::cout<<i<<" value test\n";
   }
   cout << "- btree checks out just fine." << endl;
 
